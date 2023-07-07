@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>simulate-etherscan-function-display</title>
+  <link rel="icon" href="data:,">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+    body {
+      font-family: "Roboto", system-ui, -apple-system, "Segoe UI", "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+      font-size: 0.9062rem;
+      background: hsl(216deg 50% 98%);
+    }
+
+    header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      margin: 0;
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      inline-size: min(100dvi - 16px, 1080px);
+      margin-inline: auto;
+    }
+
+    label,
+    h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      inline-size: 100%;
+      margin: 0;
+      margin-block-end: 4px;
+    }
+
+    textarea {
+      box-sizing: border-box;
+      font-size: 1rem;
+      min-inline-size: 100%;
+      min-block-size: 10ch;
+      block-size: 40dvb;
+      margin-block-end: 16px;
+      resize: vertical;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid rgb(0 0 0 / 0.1);
+    }
+
+    div.pill-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    span.pill {
+      position: relative;
+      --tooltip-opacity: 0;
+      --tooltip-visibility: hidden;
+    }
+
+    span.pill:has(.pill-text:hover) {
+      --tooltip-opacity: 1;
+      --tooltip-visibility: visible;
+    }
+
+    span.pill-text {
+      display: block;
+      box-sizing: border-box;
+      inline-size: 100%;
+      max-inline-size: 95px;
+      font-size: 0.75em;
+      font-weight: 400;
+      text-align: center;
+      line-height: 1;
+      padding-block: 0.375rem;
+      padding-inline: 0.75em;
+      background: rgb(248 249 250);
+      border-radius: 6px;
+      border: 1px solid rgb(0 0 0 / 0.1);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    span.tooltip {
+      position: absolute;
+      inset-block: 0;
+      inset-inline-start: 50%;
+      transform: translate(-50%, calc(-100% - 6px));
+      font-size: 0.78515625rem;
+      line-height: 1;
+      inline-size: max-content;
+      padding: 0.4rem;
+      border-radius: 8px;
+      background: rgb(8 29 53);
+      color: rgb(255 255 255);
+      visibility: var(--tooltip-visibility);
+      opacity: var(--tooltip-opacity);
+      transition: opacity 150ms linear;
+    }
+
+    span.tooltip::after {
+      content: "";
+      position: absolute;
+      inset-block-start: 100%;
+      inset-inline-start: 50%;
+      transform: translateX(-50%);
+      inline-size: 0.8rem;
+      block-size: 0.4rem;
+      background: rgb(8 29 53);
+      clip-path: polygon(0 0, 100% 0, 50% 90%);
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Simulate Etherscan function display</h1>
+    <p>Enter Solidity functions into the text area below to preview how the function pills will display in the Etherscan UI.</p>
+  </header>
+
+  <main>
+    <label for="functions">Solidity functions</label>
+    <textarea name="functions" id="functions" placeholder="function totalSupply() external view returns (uint256)" autocomplete="off"></textarea>
+
+    <h2>Simulated Etherscan function pills</h2>
+    <div class="pill-container"></div>
+  </main>
+
+  <script type="module">
+    // Extract all function names from arbitrary Solidity code
+    function getFunctions(code) {
+      const re = /^(function )?(?<name>[\w]+)\(.*?\)/;
+      const functions = [];
+      for (let line of code.split('\n')) {
+        line = line.trim();
+        const name = re.exec(line)?.groups?.name;
+        if (name) {
+          functions.push(name);
+        }
+      }
+      return functions;
+    }
+
+    // Converts a camelCase string into Title Case With Spaces for human readability.
+    function camelCaseToTitleCase(str) {
+      str = str[0].toLocaleUpperCase() + str.slice(1);
+      return str.replaceAll(/([A-Z]+)/g, ' $1').slice(1);
+    }
+
+    function debounce(fn, wait) {
+      let timeoutId;
+      return () => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(fn, wait);
+      }
+    }
+
+    const textarea = document.querySelector('textarea');
+    const pillContainer = document.querySelector('.pill-container');
+    textarea.addEventListener('input', debounce(() => {
+      const functions = getFunctions(textarea.value);
+      if (functions.length === 0) {
+        return;
+      }
+
+      pillContainer.innerHTML = '';
+      let tooltipCounter = 1;
+      for (const fn of functions) {
+        const displayName = camelCaseToTitleCase(fn);
+        const pillName = displayName.length > 16 ? `${displayName.slice(0, 16)}...` : displayName;
+        const tooltipId = `tooltip${tooltipCounter}`;
+        pillContainer.insertAdjacentHTML('beforeend', `
+          <span class="pill">
+            <span class="pill-text" aria-describedby="${tooltipId}">${pillName}</span>
+            <span class="tooltip" role="tooltip" id="${tooltipId}">${displayName}</span>
+          </span>`);
+        tooltipCounter++;
+      }
+    }, 250));
+  </script>
+</body>
+
+</html>
