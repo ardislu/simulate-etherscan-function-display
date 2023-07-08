@@ -137,7 +137,7 @@
   <script type="module">
     // Extract all function names from arbitrary Solidity code
     function getFunctions(code) {
-      const re = /^(function )?(?<name>[\w]+)\(.*?\)/;
+      const re = /^(function )?(?<name>[a-zA-Z$_][a-zA-Z0-9$_]*)\(.*?\)/;
       const functions = [];
       for (let line of code.split('\n')) {
         line = line.trim();
@@ -152,7 +152,7 @@
     // Converts a camelCase string into Title Case With Spaces for human readability.
     function camelCaseToTitleCase(str) {
       str = str[0].toLocaleUpperCase() + str.slice(1);
-      return str.replaceAll(/([A-Z]+)/g, ' $1').slice(1);
+      return str.replaceAll(/([A-Z$_]+)/g, ' $1').slice(1);
     }
 
     function debounce(fn, wait) {
