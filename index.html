@@ -122,6 +122,14 @@
       background: rgb(8 29 53);
       clip-path: polygon(0 0, 100% 0, 50% 90%);
     }
+
+    #output-header {
+      display: none;
+    }
+
+    textarea:not(:invalid) + #output-header {
+      display: unset;
+    }
   </style>
 </head>
 
@@ -133,9 +141,9 @@
 
   <main>
     <label for="functions">Solidity functions</label>
-    <textarea name="functions" id="functions" placeholder="function totalSupply() external view returns (uint256)" autocomplete="off"></textarea>
+    <textarea name="functions" id="functions" placeholder="function totalSupply() external view returns (uint256)" autocomplete="off" required></textarea>
 
-    <h2>Simulated Etherscan function pills</h2>
+    <h2 id="output-header">Simulated Etherscan function pills</h2>
     <div class="pill-container"></div>
   </main>
 
