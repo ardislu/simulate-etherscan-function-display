@@ -171,12 +171,12 @@
     const textarea = document.querySelector('textarea');
     const pillContainer = document.querySelector('.pill-container');
     textarea.addEventListener('input', debounce(() => {
+      pillContainer.innerHTML = '';
       const functions = getFunctions(textarea.value);
       if (functions.length === 0) {
         return;
       }
 
-      pillContainer.innerHTML = '';
       let tooltipCounter = 1;
       for (const fn of functions) {
         const displayName = camelCaseToTitleCase(fn);
