@@ -79,12 +79,10 @@
     span.pill {
       position: relative;
       --tooltip-opacity: 0;
-      --tooltip-visibility: hidden;
     }
 
     span.pill:has(.pill-text:hover) {
       --tooltip-opacity: 1;
-      --tooltip-visibility: visible;
     }
 
     span.pill-text {
@@ -117,7 +115,7 @@
       border-radius: 8px;
       background: rgb(8 29 53);
       color: rgb(255 255 255);
-      visibility: var(--tooltip-visibility);
+      pointer-events: none;
       opacity: var(--tooltip-opacity);
       transition: opacity 150ms linear;
     }
